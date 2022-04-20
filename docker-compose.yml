@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   car-app:
+    container_name: car-api
     image: carapp:develop
     ports:
-      - '8080:80'
+      - 8381:80
