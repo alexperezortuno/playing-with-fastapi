@@ -39,7 +39,7 @@ formatter = CustomFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)
 # logger.addHandler(ch)
 logger = core.app_logger.get_logger(__name__, formatter)
 config = Config()
-config.bind = [f"0.0.0.0:{os.getenv('APP_PORT', 8080)}"]
+config.bind = [f"{os.getenv('APP_HOST', '127.0.0.1')}:{os.getenv('APP_PORT', 8080)}"]
 
 
 def get_db():
@@ -56,10 +56,10 @@ def write_log_data(request, response):
 
 
 if __name__ == "__main__":
-    asgi_type = os.getenv('ASGI_TYPE', 'uvicorns')
+    asgi_type = os.getenv('ASGI_TYPE', 'uvicorn')
     if asgi_type == 'uvicorn':
-        uvicorn.run(app, host="0.0.0.0", port=int(os.getenv('APP_PORT', 8080)), log_level=os.getenv('LOG_LEVEL', 'info'))
-    else:
+        uvicorn.run(app, host=os.getenv('APP_HOST', "127.0.0.1"), port=int(os.getenv('APP_PORT', 8080)), log_level=os.getenv('LOG_LEVEL', 'info'))
+    elif asgi_type == 'hypercorn':
         trio.run(serve, app, config)
 
 
@@ -99,6 +99,7 @@ async def create_car(car: schemas.CarBase, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="car already exists")
 
     try:
+        logger.debug(f"Creating car {car.brand} {car.model}")
         return crud.create_car(db=db, car=car)
     except Exception as e:
         logger.error(e)
