@@ -1,5 +1,8 @@
 import uvicorn
 import os
+import trio
+from hypercorn.config import Config
+from hypercorn.asyncio import serve
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -35,6 +38,8 @@ formatter = CustomFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)
 # # add ch to logger
 # logger.addHandler(ch)
 logger = core.app_logger.get_logger(__name__, formatter)
+config = Config()
+config.bind = [f"0.0.0.0:{os.getenv('APP_PORT', 8080)}"]
 
 
 def get_db():
@@ -51,7 +56,11 @@ def write_log_data(request, response):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv('APP_PORT', 80)), log_level=os.getenv('LOG_LEVEL', 'info'))
+    asgi_type = os.getenv('ASGI_TYPE', 'uvicorns')
+    if asgi_type == 'uvicorn':
+        uvicorn.run(app, host="0.0.0.0", port=int(os.getenv('APP_PORT', 8080)), log_level=os.getenv('LOG_LEVEL', 'info'))
+    else:
+        trio.run(serve, app, config)
 
 
 @app.get("/")

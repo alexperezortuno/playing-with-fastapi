@@ -4,5 +4,10 @@ services:
   car-app:
     container_name: car-api
     image: carapp:develop
+    environment:
+      - APP_RELOAD=true
+      - APP_PORT=80
+      - ASGI_TYPE=hypercorn
+      - DEBUG=true
     ports:
       - 8381:80

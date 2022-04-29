@@ -3,3 +3,16 @@ gunicorn==20.1.0
 uvicorn==0.17.6
 SQLAlchemy==1.4.35
 starlette-prometheus==0.9.0
+hypercorn==0.13.2
+async-generator==1.10 
+attrs==21.4.0 
+h2==4.1.0 
+hpack==4.0.0 
+hypercorn==0.13.2 
+hyperframe==6.0.1 
+outcome==1.1.0 
+priority==2.0.0 
+sortedcontainers==2.4.0 
+toml==0.10.2 
+trio==0.20.0 
+wsproto==1.1.0
